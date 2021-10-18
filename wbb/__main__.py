@@ -104,8 +104,7 @@ home_keyboard_pm = InlineKeyboardMarkup(
 home_text_pm = "
 \n**Hey**🤞 {}, I am Erza
 \n**I am an Lite Group Manager Bot, With Lots of Cool Features❤️.**
-\n`For More Information Use the Button Below or Send` /help 
-"
+\nFor More Information Use the Button Below or Send"
 
 
 
