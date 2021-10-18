@@ -141,7 +141,7 @@ async def del_note(_, message):
         return await eor(message, text="**Usage**\n__/delete [NOTE_NAME]__")
 
     prefix = message.text.split()[0][0]
-    chat_id = else message.chat.id
+    chat_id = message.chat.id
 
     deleted = await delete_note(chat_id, name)
     if deleted:
