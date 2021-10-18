@@ -101,11 +101,10 @@ home_keyboard_pm = InlineKeyboardMarkup(
     ]
 )
 
-home_text_pm = f"""╭──────────────
+home_text_pm = f"""
 \n**Hey**🤞 {}, I am Erza
 \n**I am an Lite Group Manager Bot, With Lots of Cool Features❤️.**
 \n`For More Information Use the Button Below or Send` /help 
-╰──────────────
 """
 
 
