@@ -36,7 +36,6 @@ from wbb.utils.dbfunctions import (get_blacklist_filters_count,
                                    get_served_users, get_warns_count,
                                    remove_served_chat)
 from wbb.utils.http import get
-from wbb.utils.inlinefuncs import keywords_list
 
 
 @app.on_message(
@@ -101,14 +100,6 @@ async def global_stats(_, message):
     karmas_count = _karmas["karmas_count"]
     karmas_chats_count = _karmas["chats_count"]
 
-    # Contributors/Developers count and commits on github
-    url = "https://api.github.com/repos/thehamkercat/williambutcherbot/contributors"
-    rurl = "https://github.com/thehamkercat/williambutcherbot"
-    developers = await get(url)
-    commits = 0
-    for developer in developers:
-        commits += developer["contributions"]
-    developers = len(developers)
 
     # Rss feeds
     rss_count = await get_rss_feeds_count()
@@ -118,9 +109,8 @@ async def global_stats(_, message):
 
 
     msg = f"""
-**Global Stats of {BOT_NAME}**:
+**Stats of {BOT_NAME}**:
     **{modules_count}** Modules Loaded.
-    **{len(keywords_list)}** Inline Modules Loaded.
     **{rss_count}** Active RSS Feeds.
     **{gbans}** Globally banned users.
     **{filters_count}** Filters, Across **{filters_chats_count}** chats.
@@ -129,7 +119,8 @@ async def global_stats(_, message):
     **{warns_count}** Warns, Across **{warns_chats_count}** chats.
     **{karmas_count}** Karma, Across **{karmas_chats_count}** chats.
     **{served_users}** Users, Across **{served_chats}** chats.
-    **{developers}** Developers And **{commits}** Commits On **[Github]({rurl})**.
+ 
+ Wolf OP
 
 """
     await m.edit(msg, disable_web_page_preview=True)
