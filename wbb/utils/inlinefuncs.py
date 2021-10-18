@@ -42,7 +42,6 @@ from search_engine_parser import GoogleSearch
 
 from wbb import (BOT_USERNAME, MESSAGE_DUMP_CHAT, SUDOERS, app, arq)
 from wbb.core.keyboard import ikb
-from wbb.core.tasks import _get_tasks_text, all_tasks, rm_task
 from wbb.core.types import InlineQueryResultCachedDocument
 from wbb.modules.info import get_chat_info, get_user_info
 from wbb.modules.music import download_youtube_audio
@@ -366,65 +365,7 @@ async def lyrics_func(answers, text):
     return answers
 
 
-async def tg_search_func(answers, text, user_id):
-    if user_id not in SUDOERS:
-        msg = "**ERROR**\n__THIS FEATURE IS ONLY FOR SUDO USERS__"
-        answers.append(
-            InlineQueryResultArticle(
-                title="ERROR",
-                description="THIS FEATURE IS ONLY FOR SUDO USERS",
-                input_message_content=InputTextMessageContent(msg),
-            )
-        )
-        return answers
-    if str(text)[-1] != ":":
-        msg = "**ERROR**\n__Put A ':' After The Text To Search__"
-        answers.append(
-            InlineQueryResultArticle(
-                title="ERROR",
-                description="Put A ':' After The Text To Search",
-                input_message_content=InputTextMessageContent(msg),
-            )
-        )
 
-        return answers
-    text = text[0:-1]
-    async for message in app2.search_global(text, limit=49):
-        buttons = InlineKeyboard(row_width=2)
-        buttons.add(
-            InlineKeyboardButton(
-                text="Origin",
-                url=message.link if message.link else "https://t.me/telegram",
-            ),
-            InlineKeyboardButton(
-                text="Search again",
-                switch_inline_query_current_chat="search",
-            ),
-        )
-        name = (
-            message.from_user.first_name
-            if message.from_user.first_name
-            else "NO NAME"
-        )
-        caption = f"""
-**Query:** {text}
-**Name:** {str(name)} [`{message.from_user.id}`]
-**Chat:** {str(message.chat.title)} [`{message.chat.id}`]
-**Date:** {ctime(message.date)}
-**Text:** >>
-
-{message.text.markdown if message.text else message.caption if message.caption else '[NO_TEXT]'}
-"""
-        result = InlineQueryResultArticle(
-            title=name,
-            description=message.text if message.text else "[NO_TEXT]",
-            reply_markup=buttons,
-            input_message_content=InputTextMessageContent(
-                caption, disable_web_page_preview=True
-            ),
-        )
-        answers.append(result)
-    return answers
 
 
 async def music_inline_func(answers, query):
@@ -783,55 +724,3 @@ async def execute_code(query):
     await query.answer(results=answers, cache_time=1)
 
 
-async def task_inline_func(user_id):
-    if user_id not in SUDOERS:
-        return
-
-    tasks = all_tasks()
-    text = await _get_tasks_text()
-    keyb = None
-
-    if tasks:
-        keyb = ikb(
-            {i: f"cancel_task_{i}" for i in list(tasks.keys())},
-            row_width=4,
-        )
-
-    return [
-        InlineQueryResultArticle(
-            title="Tasks",
-            reply_markup=keyb,
-            input_message_content=InputTextMessageContent(
-                text,
-            ),
-        )
-    ]
-
-
-@app.on_callback_query(filters.regex("^cancel_task_"))
-async def cancel_task_button(_, query: CallbackQuery):
-    user_id = query.from_user.id
-
-    if user_id not in SUDOERS:
-        return await query.answer("This is not for you.")
-
-    task_id = int(query.data.split("_")[-1])
-    await rm_task(task_id)
-
-    tasks = all_tasks()
-    text = await _get_tasks_text()
-    keyb = None
-
-    if tasks:
-        keyb = ikb({i: f"cancel_task_{i}" for i in list(tasks.keys())})
-
-    await app.edit_inline_text(
-        query.inline_message_id,
-        text,
-    )
-
-    if keyb:
-        await app.edit_inline_reply_markup(
-            query.inline_message_id,
-            keyb,
-        )
