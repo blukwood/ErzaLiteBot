@@ -100,7 +100,7 @@ async def get_notes(_, message):
 
 
 
-e["data"])
+e["data"]
 
 
 @app.on_message(
